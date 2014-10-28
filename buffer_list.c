@@ -9,16 +9,17 @@ struct packet{
        struct packet *next;
 };
 
-packet* create_packet(char* buffer){
-    packet *new_packet = (packet*)malloc(sizeof(packet));
-    new_packet->buffer = buffer;
-    new_packet->next = NULL;
+packet* create_packet(char* buffer, int len){
+    packet *new_packet  = (packet*)malloc(sizeof(packet));
+    new_packet->buffer  = buffer;
+    new_packet->len     = len;
+    new_packet->next    = NULL;
     //new_packet->time = now();
     return new_packet;
 }
 
-void append_packet(packet *head, packet *tail, char *buffer){
-    packet *new_packet = create_packet(buffer);
+void push_packet(packet *head, packet *tail, char *buffer, int len){
+    packet *new_packet = create_packet(buffer, len);
     /// Empty packet list
     if(head == NULL){
         head = new_packet;
@@ -36,7 +37,7 @@ void append_packet(packet *head, packet *tail, char *buffer){
     return;
 }
 
-packet* get_next_packet(packet* head){
+packet* pop_packet(packet* head){
     packet *next = head;
     head = head->next;
 
