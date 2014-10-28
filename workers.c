@@ -1,16 +1,14 @@
 #include "workers.h"
-#include "buffer_list.h"
+//#include "buffer_list.h"
 #include "constants.h"
 
-struct workerParams{
-	int delay_avg;
-	int delay_var;
-	int lost_perc;
-	int port;
-	char *hostname;
-	packet *head;
-	packet *tail;
-};
+#include <stdlib.h>			
+#include <sys/socket.h>     // sockets
+#include <netinet/in.h>
+#include <netdb.h>			// hostent
+#include <string.h>			// memcpy
+
+
 
 void *sender(void *context){
 
@@ -18,12 +16,12 @@ void *sender(void *context){
 	int addr_len;
 	struct sockaddr_in server;
 	struct hostent *hp;
-	packet *pkt;
-	workerParams *params = context;
+	packet_t *pkt;
+	workerParams_t *params = context;
 
 	/*-----------SOCKETS----------------*/   
     /*Create the sockets*/
-    server_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    client_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	
 	/* Look up our host's network address */	
 	hp = gethostbyname(params->hostname);
@@ -58,7 +56,7 @@ void *receiver(void *context){
 	int buffer_len;
 	char buffer[MTU];
 	struct sockaddr_in server;
-	workerParams *params = context;
+	workerParams_t *params = context;
 
 	/*-----------SOCKETS----------------*/ 
 	/*Create the sockets*/

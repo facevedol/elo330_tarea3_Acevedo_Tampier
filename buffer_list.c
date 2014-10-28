@@ -1,16 +1,10 @@
+#include <stdlib.h>
 #include "buffer_list.h"
 #include "constants.h"
 
 
-struct packet{
-       char buffer[MTU];
-       int len;
-      // struct timeval time,
-       struct packet *next;
-};
-
-packet* create_packet(char* buffer, int len){
-    packet *new_packet  = (packet*)malloc(sizeof(packet));
+packet_t *create_packet(char *buffer, int len){
+    packet_t *new_packet  = (packet_t *)malloc(sizeof(packet_t));
     new_packet->buffer  = buffer;
     new_packet->len     = len;
     new_packet->next    = NULL;
@@ -18,12 +12,12 @@ packet* create_packet(char* buffer, int len){
     return new_packet;
 }
 
-void push_packet(packet *head, packet *tail, char *buffer, int len){
-    packet *new_packet = create_packet(buffer, len);
+void push_packet(packet_t *head, packet_t *tail, char *buffer, int len){
+    packet_t *new_packet = create_packet(buffer, len);
     /// Empty packet list
     if(head == NULL){
         head = new_packet;
-        return
+        return;
     }
     /// No tail defined yet
     if(tail == NULL){
@@ -37,8 +31,8 @@ void push_packet(packet *head, packet *tail, char *buffer, int len){
     return;
 }
 
-packet* pop_packet(packet* head){
-    packet *next = head;
+packet_t *pop_packet(packet_t *head){
+    packet_t *next = head;
     head = head->next;
 
     return next;    

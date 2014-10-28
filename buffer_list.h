@@ -2,11 +2,16 @@
 #define BUFFER_LIST_H
 
 /*-------------------STRUCTS----------------------------*/
-typedef struct packet packet;
+typedef struct packet{
+       char *buffer;
+       int len;
+      // struct timeval time,
+       struct packet *next;
+} packet_t;
 
 /*------------------PROTOTYPES--------------------------*/
-packet* create_packet(char* buffer);
-void 	push_packet(packet *head, packet *tail, char *buffer, int len);
-packet* pop_packet(packet* head);
+packet_t *create_packet(char* buffer, int len);
+void 	 push_packet(packet_t *head, packet_t *tail, char *buffer, int len);
+packet_t *pop_packet(packet_t *head);
 
 #endif

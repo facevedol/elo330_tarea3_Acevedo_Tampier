@@ -15,7 +15,7 @@
 #include <netdb.h>
 
 
-packet *head, *tail;
+packet_t *head, *tail;
 
 
 /*main function*/
