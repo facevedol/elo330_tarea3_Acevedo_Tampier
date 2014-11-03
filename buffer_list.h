@@ -3,10 +3,10 @@
 
 /*-------------------STRUCTS----------------------------*/
 typedef struct packet{
-       char *buffer;
-       int len;
-      // struct timeval time,
-       struct packet *next;
+    char *buffer;
+    int len;
+    struct timeval *at;     // Arrival Time
+    struct packet *next;
 } packet_t;
 
 /*------------------PROTOTYPES--------------------------*/

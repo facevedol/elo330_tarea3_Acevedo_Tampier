@@ -1,49 +1,59 @@
 #include "workers.h"
 //#include "buffer_list.h"
 #include "constants.h"
+#include <pthread.h>
 
+#include <unistd.h>
 #include <stdlib.h>			
 #include <sys/socket.h>     // sockets
 #include <netinet/in.h>
 #include <netdb.h>			// hostent
 #include <string.h>			// memcpy
+#include <time.h>
+#include <sys/time.h>
 
 
 
 void *sender(void *context){
 
-	int client_socket;
-	int addr_len;
-	struct sockaddr_in server;
-	struct hostent *hp;
 	packet_t *pkt;
 	workerParams_t *params = context;
-
-	/*-----------SOCKETS----------------*/   
-    /*Create the sockets*/
-    client_socket = socket(AF_INET, SOCK_DGRAM, 0);
+	double at; 			// Arrival time in usecs;
+	struct timeval ctv;	// Current Time in timeval
+	double ct;			// Current Time in usecs
+	double st;			// Sleep time in usec
 	
-	/* Look up our host's network address */	
-	hp = gethostbyname(params->hostname);
-	
-    /* Create the address of the server. */
-    server.sin_family = AF_INET;
-    server.sin_port = htons(params->port);
-    memcpy(&server.sin_addr, hp->h_addr_list[0], hp->h_length);
-    addr_len = sizeof(struct sockaddr_in);
-    /*----------END SOCKETS-------------*/
 
     /*--------SERVING FOR EVER----------*/
     for(;;){
 
-    	/* [TODO] Wait until producer pruduce with some semaphore */
-    	/* [TODO] Lock the list for this pop */
-    	pkt = pop_packet(params->head);
+    	/* Wait until producer pruduce with some semaphore */
+    	sem_wait(*(params->sem));
+    	pthread_mutex_lock( params->buffer_mutex );
+    		pkt = pop_packet(params->head);
+    	pthread_mutex_unlock( params->buffer_mutex );
 
-    	/* [TODO] Sleeps for (pkt->time + params->delay_avg + (rand()/RAND_MAX-1)*2*params->delay_var) - now */
-    	/* [TODO] If rand()/RAND_MAX < params->lost_perc */
-    	sendto(client_socket, pkt->buffer, pkt->len, 0, (struct sockaddr*) &server, addr_len);
-
+    	/* Sleeps for (pkt->time + params->delay_avg +/- params->delay_var) - now */
+    	at = pkt->at->tv_sec*1000000 +  pkt->at->tv_usec;
+    	gettimeofday(&ctv, NULL);
+    	ct = ctv.tv_sec*1000000 + ctv.tv_usec;
+    	if ( rand()/RAND_MAX > 0.5) {
+    		st = at + params->delay_avg + params->delay_var - ct;
+    	}
+    	else {
+    		st = at + params->delay_avg - params->delay_var - ct;
+    	}
+    	/* Sleep if needed */
+    	if ( st > 0)
+    		usleep( st );
+    	
+    	/* If the packet is not lost, send it */
+    	if ( rand()/RAND_MAX > params->lost_perc){
+	    	pthread_mutex_lock( params->addr_mutex );
+	    		sendto(*(params->socket), pkt->buffer, pkt->len, 0, (struct sockaddr*) params->addr, *(params->addr_len));
+			pthread_mutex_unlock( params->addr_mutex );
+    	}
+		free(pkt);
     }
 
 	/*---------NEVER REACHED-----------*/
@@ -51,31 +61,22 @@ void *sender(void *context){
 
 void *receiver(void *context){
 	
-	int server_socket;
-	int addr_len;
 	int buffer_len;
 	char buffer[MTU];
-	struct sockaddr_in server;
 	workerParams_t *params = context;
-
-	/*-----------SOCKETS----------------*/ 
-	/*Create the sockets*/
-    server_socket = socket(AF_INET, SOCK_DGRAM, 0);
-
-	/* Create the address of the server.*/
-    server.sin_family = AF_INET;
-    server.sin_port = htons(params->port);
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr_len = sizeof(struct sockaddr_in);
-    bind(server_socket, (struct sockaddr *) &server, addr_len);
-    /*----------END SOCKETS-------------*/
 
     /*--------SERVING FOR EVER----------*/
     for(;;){
-	    if ((buffer_len = recv(server_socket, buffer, sizeof(buffer), 0)) > 0){
-			/* [TODO] Lock the list for this push */
-			push_packet(params->head, params->tail, buffer, buffer_len);
-			/* [TODO] Add to the produced counter */
+    	pthread_mutex_lock( params->addr_mutex );
+    		buffer_len = recvfrom(*(params->socket), buffer, sizeof(buffer), 0, (struct sockaddr*)params->addr, params->addr_len);
+	    pthread_mutex_unlock( params->addr_mutex );
+	    
+	    if (buffer_len > 0){
+			pthread_mutex_lock( params->addr_mutex );
+				push_packet(params->head, params->tail, buffer, buffer_len);
+			pthread_mutex_unlock( params->addr_mutex );
+			/* Signal that are packets availables */
+			sem_signal(*(params->sem));
 		}
 	}
 

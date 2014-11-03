@@ -2,13 +2,15 @@
 #include "buffer_list.h"
 #include "constants.h"
 
+#include <time.h>
+#include <sys/time.h>
 
 packet_t *create_packet(char *buffer, int len){
-    packet_t *new_packet  = (packet_t *)malloc(sizeof(packet_t));
-    new_packet->buffer  = buffer;
-    new_packet->len     = len;
-    new_packet->next    = NULL;
-    //new_packet->time = now();
+    packet_t *new_packet    = (packet_t *)malloc(sizeof(packet_t));
+    new_packet->buffer      = buffer;
+    new_packet->len         = len;
+    new_packet->next        = NULL;
+    gettimeofday(new_packet->at, NULL);
     return new_packet;
 }
 
