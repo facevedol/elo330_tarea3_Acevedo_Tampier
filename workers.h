@@ -7,7 +7,7 @@
 /*-------------------STRUCTS----------------------------*/
 typedef struct workerParams{
 	struct sockaddr_in *addr;
-	int *addr_len;
+	unsigned int *addr_len;
 	int *socket;
 	int delay_avg;
 	int delay_var;

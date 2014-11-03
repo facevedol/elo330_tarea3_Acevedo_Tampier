@@ -5,6 +5,7 @@
 #include "buffer_list.h"    // buffer handlers
 #include "workers.h"        // conection handlers, here is where the job is done
 #include "constants.h"      // constants
+#include "semaph.h"
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -20,7 +21,7 @@ packet_t *head_c2s = NULL, *tail_c2s = NULL;
 packet_t *head_s2c = NULL, *tail_s2c = NULL;
 int client_socket, server_socket;
 struct sockaddr_in server_snd, server_rcv, client;
-int server_snd_len, server_rcv_len, client_len;
+unsigned int server_snd_len, server_rcv_len, client_len;
 
 /* Init Mutex */
 pthread_mutex_t client_addr_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]){
     pthread_t Mythread[4];
 	
 	/*------COMMAND LINE ARGUMENTS-------*/
-	    
+	   
     if(argc == 5){
         
         delay_avg = atoi(argv[1]);
@@ -181,13 +182,13 @@ int main(int argc, char *argv[]){
 
 
     /* Theads initialization*/
-    if (error = pthread_create(&(Mythread[0]),NULL,&sender,&params_c2s_snd))
+    if ((error = pthread_create(&(Mythread[0]),NULL,&sender,&params_c2s_snd)))
         fprintf(stderr,"Error creating thread 0: %s\n",strerror(error));
-    if (error = pthread_create(&(Mythread[0]),NULL,&sender,&params_s2c_snd))
+    if ((error = pthread_create(&(Mythread[0]),NULL,&sender,&params_s2c_snd)))
         fprintf(stderr,"Error creating thread 0: %s\n",strerror(error));
-    if (error = pthread_create(&(Mythread[0]),NULL,&receiver,&params_c2s_rcv))
+    if ((error = pthread_create(&(Mythread[0]),NULL,&receiver,&params_c2s_rcv)))
         fprintf(stderr,"Error creating thread 0: %s\n",strerror(error));
-    if (error = pthread_create(&(Mythread[0]),NULL,&receiver,&params_s2c_rcv))
+    if ((error = pthread_create(&(Mythread[0]),NULL,&receiver,&params_s2c_rcv)))
         fprintf(stderr,"Error creating thread 0: %s\n",strerror(error));
 
     

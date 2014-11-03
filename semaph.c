@@ -30,7 +30,9 @@
 #include	<sys/types.h>
 #include	<sys/ipc.h>
 #include	<sys/sem.h>
+#include 	"semaph.h"
 
+#include <stdio.h>
 #include	<errno.h>
 extern int	errno;
 
@@ -200,7 +202,7 @@ key_t	key;
  * regardless whether other processes may be using it or not.
  * Most other processes should use sem_close() below.
  */
-
+void
 sem_rm(id)
 int	id;
 {
@@ -215,7 +217,7 @@ int	id;
  * We "decrement" the counter of processes using the semaphore, and
  * if this was the last one, we can remove the semaphore.
  */
-
+void
 sem_close(id)
 int	id;
 {
@@ -254,7 +256,7 @@ int	id;
  * it by 1 and return.
  * Dijkstra's P operation.  Tanenbaum's DOWN operation.
  */
-
+void
 sem_wait(id)
 int	id;
 {
@@ -265,7 +267,7 @@ int	id;
  * Increment a semaphore by 1.
  * Dijkstra's V operation.  Tanenbaum's UP operation.
  */
-
+void
 sem_signal(id)
 int	id;
 {
@@ -276,7 +278,7 @@ int	id;
  * General semaphore operation.  Increment or decrement by a user-specified
  * amount (positive or negative; amount can't be zero).
  */
-
+void
 sem_op(id, value)
 int	id;
 int	value;
