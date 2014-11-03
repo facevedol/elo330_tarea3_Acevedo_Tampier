@@ -5,7 +5,7 @@
 #include "buffer_list.h"    // buffer handlers
 #include "workers.h"        // conection handlers, here is where the job is done
 #include "constants.h"      // constants
-#include "semaph.h"
+
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -17,28 +17,30 @@
 #include <netdb.h>
 
 
-packet_t *head_c2s = NULL, *tail_c2s = NULL;
-packet_t *head_s2c = NULL, *tail_s2c = NULL;
-int client_socket, server_socket;
-struct sockaddr_in server_snd, server_rcv, client;
-unsigned int server_snd_len, server_rcv_len, client_len;
-
-/* Init Mutex */
-pthread_mutex_t client_addr_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t server_addr_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t buffer_c2s_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t buffer_s2c_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-/* Init semaphores */
-
-int sem_c2s;
-int sem_s2c;
-
 
 
 
 /*main function*/
 int main(int argc, char *argv[]){
+
+
+    packet_t *head_c2s = NULL, *tail_c2s = NULL;
+    packet_t *head_s2c = NULL, *tail_s2c = NULL;
+
+    int client_socket, server_socket;
+    struct sockaddr_in server_snd, server_rcv, client;
+    unsigned int server_snd_len, server_rcv_len, client_len;
+    
+    /* Init Mutex */
+    pthread_mutex_t client_addr_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t server_addr_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t buffer_c2s_mutex  = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t buffer_s2c_mutex  = PTHREAD_MUTEX_INITIALIZER;
+    
+    /* Init semaphores */
+    
+    int sem_c2s;
+    int sem_s2c;
 
     /*input vars*/
     int delay_avg;
@@ -55,7 +57,7 @@ int main(int argc, char *argv[]){
     pthread_t Mythread[4];
 	
 	/*------COMMAND LINE ARGUMENTS-------*/
-	   
+	printf("Getting the arguments");
     if(argc == 5){
         
         delay_avg = atoi(argv[1]);

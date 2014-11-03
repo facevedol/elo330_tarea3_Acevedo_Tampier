@@ -1,9 +1,11 @@
 #ifndef BUFFER_LIST_H
 #define BUFFER_LIST_H
 
+#include "constants.h"
+
 /*-------------------STRUCTS----------------------------*/
 typedef struct packet{
-    char *buffer;
+    char buffer[MTU];
     int len;
     struct timeval *at;     // Arrival Time
     struct packet *next;

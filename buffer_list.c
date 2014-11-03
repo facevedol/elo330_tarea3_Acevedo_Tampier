@@ -4,12 +4,13 @@
 
 #include <time.h>
 #include <sys/time.h>
+#include <string.h>
 
 packet_t *create_packet(char *buffer, int len){
     packet_t *new_packet    = (packet_t *)malloc(sizeof(packet_t));
-    new_packet->buffer      = buffer;
     new_packet->len         = len;
     new_packet->next        = NULL;
+    strcpy(new_packet->buffer, buffer);
     gettimeofday(new_packet->at, NULL);
     return new_packet;
 }
