@@ -12,13 +12,14 @@
 #include <string.h>			// memcpy
 #include <time.h>
 #include <sys/time.h>
+#include <stdio.h>
 
 
 
 void *sender(void *context){
-
+	printf("SENDER\n");
 	packet_t *pkt;
-	workerParams_t *params = context;
+	workerParams_t *params = (workerParams_t *)context;
 	double at; 			// Arrival time in usecs;
 	struct timeval ctv;	// Current Time in timeval
 	double ct;			// Current Time in usecs
@@ -61,7 +62,7 @@ void *sender(void *context){
 }
 
 void *receiver(void *context){
-	
+	printf("Receiver\n");
 	int buffer_len;
 	char buffer[MTU];
 	workerParams_t *params = context;

@@ -1,7 +1,16 @@
-erp_udp.o workers.o semaph.o buffer_list.o: constants.h
+all: workers.o semaph.o buffer_list.o erp
 
-erp: erp_udp.o workers.o semaph.o buffer_list.o
-	gcc -Wall -o output erp_udp.o workers.o semaph.o buffer_list.o -lpthread -I. -g
+erp: erp_udp.c semaph.c workers.c buffer_list.c
+	gcc -Wall -o output erp_udp.c workers.o semaph.o buffer_list.o -lpthread -I. -g
+
+semaph.o: semaph.c
+	gcc -c semaph.c -o semaph.o
+	
+workers.o: workers.c
+	gcc -Wall -c workers.c -o workers.o
+	
+buffer_list.o: buffer_list.c
+	gcc -Wall -c buffer_list.c -o buffer_list.o
 
 clean:
 	rm output *.o
