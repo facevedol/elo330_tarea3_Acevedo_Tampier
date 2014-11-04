@@ -8,12 +8,14 @@
 typedef struct workerParams{
 	struct sockaddr_in *addr;
 	unsigned int *addr_len;
+	struct sockaddr_in *from_addr;
+	unsigned int *from_addr_len;
 	int *socket;
 	int delay_avg;
 	int delay_var;
-	int lost_perc;
-	packet_t *head;
-	packet_t *tail;
+	float lost_perc;
+	packet_t **head;
+	packet_t **tail;
 	int *sem;
 	pthread_mutex_t *buffer_mutex;
 	pthread_mutex_t *addr_mutex;
