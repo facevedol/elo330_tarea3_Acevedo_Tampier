@@ -188,6 +188,7 @@ int main(int argc, char *argv[]){
 	params_s2c_rcv->buffer_mutex= &buffer_s2c_mutex;
 	params_s2c_rcv->addr_mutex  = &server_addr_mutex;
 	
+	printf("Client socket: %d", client_socket);
     
     /* Theads initialization*/
     if ((error = pthread_create(&(Mythread[0]),NULL,&sender,params_c2s_snd)))
